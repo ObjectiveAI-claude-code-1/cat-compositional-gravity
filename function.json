@@ -1,0 +1,148 @@
+{
+  "type": "scalar.function",
+  "input_schema": {
+    "type": "object",
+    "description": "A single photograph containing at least one cat whose positional authority within the frame will be evaluated.",
+    "properties": {
+      "image": {
+        "type": "image",
+        "description": "A photograph containing at least one cat. The function evaluates where the primary cat is situated relative to the natural focal points of the image — the center, the rule-of-thirds intersections, and the overall compositional stage — to determine how much positional authority the cat commands within the frame."
+      }
+    },
+    "required": [
+      "image"
+    ]
+  },
+  "tasks": [
+    {
+      "type": "vector.completion",
+      "messages": [
+        {
+          "role": "user",
+          "content": [
+            {
+              "$jmespath": "input.image"
+            },
+            {
+              "type": "text",
+              "text": "Look at where the cat is positioned in this photograph. How closely does the cat's position align with the image's natural focal points — the center of the frame and the rule-of-thirds intersections?"
+            }
+          ]
+        }
+      ],
+      "responses": [
+        [
+          {
+            "type": "text",
+            "text": "The cat is positioned directly at or very near one of the image's strongest focal points. Its body or face falls at the center of the frame or on a rule-of-thirds intersection — one of the positions where the eye lands instinctively. The cat benefits fully from the geometry of compositional attention."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "The cat is positioned in a transitional zone — somewhat near a focal point but not squarely on one. It is not lost in the margins, but it does not fully command one of the frame's natural positions of visual gravity either. The alignment is partial."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "The cat is positioned far from any of the image's natural focal points. It sits in compositional no-man's-land — distant from both the center and the rule-of-thirds intersections — in the territory where subjects of lesser importance tend to appear."
+          }
+        ]
+      ],
+      "output": {
+        "$starlark": "output[\"scores\"][0] * 1.0 + output[\"scores\"][1] * 0.5 + output[\"scores\"][2] * 0.0"
+      }
+    },
+    {
+      "type": "vector.completion",
+      "messages": [
+        {
+          "role": "developer",
+          "content": [
+            {
+              "type": "text",
+              "text": "You are a photographic composition analyst. When shown a photograph containing a cat, assess whether the cat commands the broad interior stage of the image or has been pushed toward its boundaries. Focus on the cat's distance from the edges and corners of the frame — not on specific focal points, but on whether the cat occupies the middle ground of the composition or has been relegated to the periphery."
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "content": [
+            {
+              "$jmespath": "input.image"
+            },
+            {
+              "type": "text",
+              "text": "Does the cat command the interior of this frame, or has it been pushed to the edges?"
+            }
+          ]
+        }
+      ],
+      "responses": [
+        [
+          {
+            "type": "text",
+            "text": "The cat commands the interior of the frame. It is surrounded by the image on all sides, occupying the broad middle ground of the composition like a principal actor centered on a stage. The frame wraps around the cat as if the scene were designed for it."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "The cat sits between the center and the edges — not fully commanding the interior, but not entirely marginalized either. It leans toward a boundary without being pressed against it. Its centrality is moderate."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "The cat has been pushed to the edges or corners of the frame. It is pressed against a margin — the top, bottom, left, or right boundary — where it feels secondary to the empty space around it, as though it is about to leave the scene rather than own it."
+          }
+        ]
+      ],
+      "output": {
+        "$starlark": "output[\"scores\"][0] * 1.0 + output[\"scores\"][1] * 0.5 + output[\"scores\"][2] * 0.0"
+      }
+    },
+    {
+      "type": "vector.completion",
+      "messages": [
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": "Consider this photograph and the placement of the cat within it. Based purely on where the cat is positioned in the frame, does it feel like this photograph was deliberately composed to feature the cat as its subject?"
+            },
+            {
+              "$jmespath": "input.image"
+            }
+          ]
+        }
+      ],
+      "responses": [
+        [
+          {
+            "type": "text",
+            "text": "Yes — the cat's placement unmistakably announces it as the subject of this photograph. It is positioned the way important things are positioned: where a portrait painter would place a face, where a cinematographer would frame the principal character. The composition feels built around the cat. This is a photograph of a cat."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "Somewhat — the cat's placement suggests it may be the subject, but the positioning is ambiguous. The cat is visible and reasonably placed, but it does not fully occupy the compositional ground that would make its subjecthood feel certain. It could be the subject, or it could be one element among several."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "No — the cat's placement does not communicate subjecthood. It is positioned in background territory, in the margins, or in dead space that a viewer's eye skips over. The cat feels like it wandered into someone else's scene. This is a photograph that happens to contain a cat, not a photograph of a cat."
+          }
+        ]
+      ],
+      "output": {
+        "$starlark": "output[\"scores\"][0] * 1.0 + output[\"scores\"][1] * 0.5 + output[\"scores\"][2] * 0.0"
+      }
+    }
+  ],
+  "description": "Scores a cat's positional authority in a photograph from 0 to 1 by evaluating focal point alignment, centrality of presence, and subject intentionality. High scores mean the cat holds the compositional high ground where the eye expects the subject; low scores mean it occupies the margins where secondary elements appear."
+}
